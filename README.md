@@ -1,3 +1,9 @@
+<center>
+    <img src="icon-modified.png">
+</center>
+
+
+
 # n5 Deep Learning Framework 🚀
 
 A lightweight, modular deep-learning micro-framework written from scratch in Python + NumPy.
