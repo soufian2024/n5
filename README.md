@@ -2,7 +2,7 @@
 
 <p align="center">
   <picture>
-    <img src="icon.png" width="150" alt="n5 Logo" style="max-width: 100%; display: inline-block; vertical-align: middle;" align="center">
+    <img src="icon-modified.png" width="150" alt="n5 Logo" style="max-width: 100%; display: inline-block; vertical-align: middle;" align="center">
   </picture>
 </p>
 
