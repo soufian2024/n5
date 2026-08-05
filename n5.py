@@ -17,6 +17,7 @@
 # copyright header intact without modification.
 # ==============================================================================
 
+
 ##################################################
 ##                                              ##
 ##                           ##########         ##
@@ -290,8 +291,8 @@ class nn5:
                 if (i + 1) % max(1, epochs // 5) == 0 or i == 0:
                     print(f"Epoch {i+1}/{epochs} -> Loss ({loss_type}): {loss:.6f}")
 
-                self.is_trained = True
-                print(f"🏁 Training finalized cleanly! Final Loss metric achieved: {self.history[-1]:.6f}")
+            self.is_trained = True
+            print(f"🏁 Training finalized cleanly! Final Loss metric achieved: {self.history[-1]:.6f}")
 
         def summary(self):
             """Generates a factual diagnostic tracking overview detailing network metrics."""
