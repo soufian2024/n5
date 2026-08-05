@@ -152,4 +152,3 @@ If you want to contribute, open an issue describing the change and contact the o
 
 ---
 
-If you want, I can now open a Pull Request that updates README.md, the code (n5.py), and LICENSE together. Or I can open separate PRs. Tell me how you'd like to proceed.
