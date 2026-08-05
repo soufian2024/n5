@@ -1,5 +1,7 @@
 <center>
-    <img src="icon-modified.png">
+    <div>
+    <img src="icon-modified.png" weight="50px" height="50px">
+    </div>
 </center>
 
 
