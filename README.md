@@ -1,8 +1,11 @@
 # n5 Deep Learning Framework 🚀
 
 <p align="center">
-  <img src="icon.png" width="150" alt="n5 Logo" style="border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+  <picture>
+    <img src="icon.png" width="150" alt="n5 Logo" style="max-width: 100%; display: inline-block; vertical-align: middle;" align="center">
+  </picture>
 </p>
+
 
 A lightweight, modular, and dynamic deep learning framework built completely from scratch in Python and NumPy. It features advanced mathematical optimization paths, static operational layers, and a native structural `.n5` model serialization system.
 
