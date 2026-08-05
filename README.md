@@ -1,93 +1,95 @@
 # n5 Deep Learning Framework 🚀
 
 <p align="center">
-  <img src="icon.png" width="150" alt="n5 Logo">
+  <img src="icon.png" width="150" alt="n5 Logo" style="border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
 </p>
 
-A lightweight, dynamic deep learning framework built completely from scratch in Python and NumPy. It features a custom structural `.n5` model serialization and storage architecture.
+A lightweight, modular, and dynamic deep learning framework built completely from scratch in Python and NumPy. It features advanced mathematical optimization paths, static operational layers, and a native structural `.n5` model serialization system.
 
 ---
 
-## 🌟 Core Technical Architecture
+## 🌟 Architecture Overview
 
-- **Dynamic Computational Graph (Autograd)**: A custom reverse-mode automatic differentiation engine that dynamically tracks matrix operations and builds evaluation graphs on the fly.
-- **Zero-Dependency Core**: Pure mathematical and algorithmic implementation relying strictly on NumPy for high-performance matrix mechanics—no black-box modern ML libraries.
-- **Proprietary `.n5` Format**: A custom binary sequential file structure designed for lightweight, fast model serialization, saving both structural metadata and raw tensor weights.
+The framework is divided into two decoupled programmatic engines:
+1. **`f5` (Mathematical Engine)**: Handles advanced activation functions (`ReLU`, `Leaky ReLU`, `Sigmoid`, `Tanh`, `Softmax`, `ELU`, `SELU`, `GELU`), their analytical derivatives, and complex loss metrics (`MSE`, `MAE`, `BCE`, `Huber`, `Hinge`).
+2. **`nn5` (Structural Engine)**: Manages object-oriented neural components including the state-tracking `Dense` layer (with native He/Variance initialization) and the sequential graph execution container (`Sequential`).
 
 ---
 
 ## 🛠️ Repository Structure
 
 ```text
-├── check_point/   # Directory containing experimental and historical backups
-├── n5.py          # Framework Core (Tensor class, Autograd engine, Layer modules)
-├── main.py        # Entry point (Training pipelines and framework verification)
-├── module.n5      # Compiled custom structural binary weights file
-├── LICENSE        # Ironclad Proprietary & Non-Commercial License
+├── check_point/   # Directory containing legacy development snapshots
+├── n5.py          # Core engine (f5 math hub & nn5 deep learning modules)
+├── main.py        # Project entry point (Training scripts and testing pipelines)
+├── model.n5       # Packed production-ready structural binary model file
+├── LICENSE        # Copyright & Non-Commercial Protection Notice
 └── README.md      # System documentation
 ```
 
-### ⚠️ Note on the `check_point` Directory
-The `check_point/` folder is used exclusively for historical version control and architectural backups. 
-- Some legacy versions stored inside this directory **may be corrupted, unstable, or broken** due to breaking changes during development.
-- Other checkpoints contain functional, working iterations of the engine. Use these historical files with caution during academic testing.
+### ⚠️ Important Notice regarding `check_point/`
+The `check_point/` directory contains legacy developmental snapshots and older architectural backups of the network. 
+- **Disclaimer**: Some evolutionary copies inside this folder might be **unstable, corrupted, or broken** due to fundamental structural refactoring during development.
+- Other historical versions are functional and can be executed for progressive research tracking. Use with caution.
 
 ---
 
 ## 💻 Developer Quick Start Guide
 
-### 1. Graph Initialization & Forward Pass
+### 1. Network Assembly & Topology Inspection
 ```python
 import numpy as np
-from n5 import Tensor, Linear
+from n5 import nn5
 
-# Initialize an input Tensor with gradient tracking enabled
-x = Tensor([[0.5, -0.2, 0.1]], requires_grad=True)
+# Instantiate a sequential pipeline container
+model = nn5.Sequential()
 
-# Define a Structural Linear (Dense) layer (3 inputs -> 4 outputs)
-layer = Linear(3, 4)
+# Stack discrete operational layers (Dense) dynamically
+model.add(nn5.Dense(input_size=3, output_size=8, activation='gelu'))
+model.add(nn5.Dense(input_size=8, output_size=4, activation='leaky_relu'))
+model.add(nn5.Dense(input_size=4, output_size=1, activation='sigmoid'))
 
-# Execute dynamic forward propagation
-output = layer.forward(x)
-print("Forward Pass Matrix Output:\n", output.data)
+# Generate an architectural diagnostic summary report
+model.summary()
 ```
 
-### 2. Reverse-Mode Autograd Execution
+### 2. Parameter Optimization & Backpropagation
 ```python
-# Compute gradients automatically across the computational graph
-output.backward()
+# Generate synthetic dataset matrices via NumPy
+X_train = np.random.randn(100, 3)
+y_train = np.random.randint(0, 2, (100, 1))
 
-# Extract calculated weight gradients from the layer
-print("Evaluated Weight Gradients:\n", layer.w.grad)
+# Trigger continuous topological backpropagation training paths
+model.train(X_train, y_train, epochs=200, lr_init=0.05, loss_type='bce')
+
+# Execute fast production-ready inference mapping
+predictions = model.predict(X_train)
 ```
 
-### 3. Model Serialization (`.n5`)
+### 3. Model Serialization & Production Loading (`.n5`)
 ```python
-from n5 import save_n5, load_n5
+# Package and dump the complete live computational model graph to disk
+model.save("model.n5")
 
-# Serialize the active layers dynamically into the custom .n5 format
-save_n5(layer, "module.n5")
-print("Model dynamically compiled and saved as module.n5")
-
-# De-serialize and load weights back into a structural module
-# load_n5("module.n5", layer)
+# De-serialize and instantiate an identical production-ready binary execution state
+production_model = nn5.Sequential.load("model.n5")
 ```
 
 ---
 
-## ⚖️ Proprietary Legal Terms & Restrictions
+## ⚖️ Copyright & Strict Non-Commercial License
 
-This software is strictly governed by an **Ironclad Proprietary, Exclusive Copyright & Non-Commercial License**. All rights are reserved exclusively to **soufian2024**.
+This source code is released exclusively under a strict **Proprietary Copyright & Trademark License Notice**. All rights are reserved to **soufian2024**.
 
-- **Authorized Usage**: Granted strictly to natural persons for individual **academic learning, personal software study, and non-profit university research**.
-- **Commercial Prohibition**: Selling, leasing, licensing, redistributing, or exploiting this codebase, its underlying mathematical structures, or the `.n5` file extension for corporate or monetary profit is strictly forbidden.
-- **AI Training Ban**: No Artificial Intelligence (AI) models, Large Language Models (LLMs), or web scrapers are permitted to ingest, parse, or train upon this source code. Structural plagiarism claimed as "AI-generated derivatives" is legally actioned.
-- **Plagiarism Enforcement**: You cannot modify, fork, or rebrand this micro-framework to distribute it under another developer's name or brand.
+### 🚫 Strict Enforcement Rules:
+1. **Academic and Study Authorization**: Granted solely to individual natural persons for **educational learning, non-commercial personal software research, and university study**.
+2. **Commercial Restrictions**: Any corporate deployment, use in business infrastructure, integration into paid software packages, or reselling of this framework and its `.n5` serialization mechanism for profit is **STRICTLY PROHIBITED**.
+3. **Automated AI Training Ban**: No computational entity, automated data scraper, dataset harvester, or Artificial Intelligence (AI / LLM) system is permitted to parse, read, or train upon this source code. Structural plagiarism claimed as "AI derivatives" will face direct legal action.
 
-> **Legal Action**: Breach of these terms immediately revokes all permissions, triggering global DMCA takedowns, digital copyright strikes, and aggressive international litigation for maximum financial damages.
+> **Remedies**: Any breach revokes all usage permissions immediately, triggering global DMCA takedown requests, repository suspension actions, and international litigation for copyright damages.
 
 ---
 
-## 🧑‍💻 Exclusive Legal Owner
-- **Copyright Owner**: [@soufian2024](https://github.com)
-- **Engine & Format**: `n5` Deep Learning Framework & `.n5` Serialization Format (c) 2024-2026.
+## 🧑‍💻 Author & Project Maintainer
+- **Exclusive Legal Owner**: [@soufian2024](https://github.com)
+- **Core Technology**: `n5` Deep Learning Engine & `.n5` File Structure (c) 2024-2026.
