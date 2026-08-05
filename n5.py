@@ -1,6 +1,6 @@
-# ==============================================================================
+# ======================================================================
 # COPYRIGHT, TRADEMARK AND PROPERTY LICENSE NOTICE
-# ==============================================================================
+# ======================================================================
 # Copyright (c) 2024-2026 soufian2024. All rights reserved.
 #
 # LICENSING TERMS:
@@ -15,7 +15,7 @@
 #
 # Any authorized open-source fork or study copy must retain this original
 # copyright header intact without modification.
-# ==============================================================================
+# ======================================================================
 
 
 ##################################################
@@ -34,6 +34,8 @@
 
 import numpy as np
 import pickle
+import json
+import os
 
 class f5:
     """
@@ -82,7 +84,14 @@ class f5:
 
     @staticmethod
     def d_softmax(Z):
-        return np.ones_like(Z)
+        # NOTE: full softmax derivative is a Jacobian matrix; returning an
+        # elementwise s*(1-s) is a practical approximation often used when
+        # softmax is applied element-wise with independent losses. For
+        # mathematically correct backprop through softmax, prefer using
+        # combined softmax+cross-entropy loss or implement Jacobian-vector
+        # product. This is safer than returning ones_like which was incorrect.
+        s = f5.softmax(Z)
+        return s * (1 - s)
 
     @staticmethod
     def elu(Z, alpha=1.0):
@@ -111,10 +120,15 @@ class f5:
 
     @staticmethod
     def d_gelu(Z):
-        # Precise continuous derivation of the cumulative distribution function
-        cdf = 0.5 * (1.0 + np.tanh(np.sqrt(2 / np.pi) * (Z + 0.044715 * np.power(Z, 3))))
-        pdf = np.exp(-0.5 * Z**2) / np.sqrt(2 * np.pi)
-        return cdf + Z * pdf
+        # Derivative corresponding to the tanh-based GELU approximation
+        sqrt_2_over_pi = np.sqrt(2.0 / np.pi)
+        x = Z
+        tanh_arg = sqrt_2_over_pi * (x + 0.044715 * x**3)
+        tanh_val = np.tanh(tanh_arg)
+        left = 0.5 * (1.0 + tanh_val)
+        # derivative of the tanh-approx term
+        right = (0.5 * x * (1 - tanh_val**2) * sqrt_2_over_pi * (1 + 3 * 0.044715 * x**2))
+        return left + right
 
     @staticmethod
     def activation(Z, activation='relu'):
@@ -148,7 +162,7 @@ class f5:
 
     @staticmethod
     def d_loss_mse(y_predict, y_true):
-        # Computes element-wise partial derivative for Mean Squared Error
+        # Computes element-wise partial derivative for Mean Squared Error (averaged)
         return 2 * (y_predict - y_true) / y_predict.size
 
     @staticmethod
@@ -182,7 +196,8 @@ class f5:
     def d_loss_huber(y_predict, y_true, delta=1.0):
         error = y_predict - y_true
         is_small_error = np.abs(error) <= delta
-        return np.where(is_small_error, error, delta * np.sign(error)) / y_predict.shape
+        grad = np.where(is_small_error, error, delta * np.sign(error))
+        return grad / y_predict.size
 
     @staticmethod
     def loss_hinge(y_predict, y_true):
@@ -190,7 +205,8 @@ class f5:
 
     @staticmethod
     def d_loss_hinge(y_predict, y_true):
-        return np.where(1 - y_true * y_predict > 0, -y_true, 0) / y_predict.shape
+        grad = np.where(1 - y_true * y_predict > 0, -y_true, 0)
+        return grad / y_predict.size
 
     @staticmethod
     def compute_loss(y_predict, y_true, loss_type='mse'):
@@ -242,6 +258,7 @@ class nn5:
         def backward(self, da1):
             """Applies matrix-level chain rule calculus to isolate discrete parameters errors."""
             dZ = da1 * f5.d_activation(self.Z, self.activation)
+            # If dZ shape equals batch x out -> dW should be averaged over batch
             self.dW = np.dot(self.X.T, dZ)
             self.dB = np.sum(dZ, axis=0, keepdims=True)
             ga = np.dot(dZ, self.W.T)  # Transmit backprop error matrix to previous layer
@@ -283,7 +300,7 @@ class nn5:
                 for layer in reversed(self.layers):
                     gradients = layer.backward(da)
 
-                    # Core Fix: Extract only the backward gradient vector (ga) from index 2
+                    # Extract only the backward gradient vector (ga) from index 2
                     da = gradients[2]
 
                     layer.update(lr_init)
@@ -311,21 +328,85 @@ class nn5:
                 output_shape = f"(None, {layer.output_size})"
                 print(f"{layer_name:<20}{output_shape:<20}{layer_params:,}")
                 print("-"*65)
-                print(f"Total trainable params: {total_params:,}")
-                print("="*65 + "\n")
+
+            print(f"Total trainable params: {total_params:,}")
+            print("="*65 + "\n")
 
         def save(self, filepath="model.n5"):
-            """Serializes the entire operational neural graph directly to native .n5 architecture format."""
+            """Serializes the entire operational neural graph directly to native .n5 architecture format.
+
+            WARNING: This method uses pickle which will execute arbitrary code when loading.
+            Only load .n5 files you trust. For a safer, portable state export use save_state/load_state (.npz).
+            """
             if not filepath.endswith('.n5'):
                 filepath += '.n5'
             with open(filepath, 'wb') as f:
                 pickle.dump(self, f)
             print(f"💾 Dynamic model successfully packed and saved to '{filepath}'!")
 
+        def save_state(self, filepath="model.npz"):
+            """Save model parameters (weights, biases and metadata) in a portable .npz archive.
+
+            This method is safer and recommended for exchanging model parameters. It does not
+            serialize Python objects or executable code.
+            """
+            if not filepath.endswith('.npz'):
+                filepath += '.npz'
+
+            arrays = {}
+            meta = {
+                'num_layers': len(self.layers),
+                'activations': [layer.activation for layer in self.layers],
+                'output_sizes': [layer.output_size for layer in self.layers],
+                'is_trained': self.is_trained,
+                'history': self.history,
+            }
+
+            for idx, layer in enumerate(self.layers):
+                arrays[f'layer{idx}_W'] = layer.W
+                arrays[f'layer{idx}_B'] = layer.B
+
+            # Save arrays and metadata (metadata stored as json string)
+            arrays['__meta__'] = np.array(json.dumps(meta), dtype=object)
+            np.savez_compressed(filepath, **arrays)
+            print(f"💾 Model state saved to '{filepath}' (npz format). Use load_state to restore.")
+
         @staticmethod
         def load(filepath="model.n5"):
-            """Deserializes and initializes instant production-ready .n5 model state binaries."""
+            """Deserializes and initializes instant production-ready .n5 model state binaries.
+
+            WARNING: This uses pickle and will execute code; only load files you trust.
+            """
             with open(filepath, 'rb') as f:
                 loaded_model = pickle.load(f)
             print(f"📂 Custom .n5 model successfully loaded and ready for immediate deployment!")
             return loaded_model
+
+        @staticmethod
+        def load_state(filepath="model.npz"):
+            """Load model state saved by save_state. Returns a Sequential instance reconstructed.
+
+            Note: load_state expects numpy.load(..., allow_pickle=True) for __meta__ content.
+            """
+            if not os.path.exists(filepath):
+                raise FileNotFoundError(f"Model state file not found: {filepath}")
+
+            data = np.load(filepath, allow_pickle=True)
+            meta = json.loads(str(data['__meta__'].tolist()))
+            seq = nn5.Sequential()
+
+            for idx in range(meta['num_layers']):
+                W = data[f'layer{idx}_W']
+                B = data[f'layer{idx}_B']
+                activation = meta['activations'][idx]
+                layer = nn5.Dense(W.shape[0], W.shape[1], activation=activation)
+                layer.W = W
+                layer.B = B
+                seq.add(layer)
+
+            seq.is_trained = bool(meta.get('is_trained', False))
+            seq.history = meta.get('history', [])
+            print(f"📂 Model state loaded from '{filepath}' into new Sequential instance.")
+            return seq
+
+
