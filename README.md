@@ -1,8 +1,10 @@
+<html>
 <center>
     <div>
-    <img src="icon-modified.png" weight="50px" height="50px">
+    <img src="icon-modified.png" weight="100px" height="100px">
     </div>
 </center>
+</html>
 
 
 
