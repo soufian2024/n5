@@ -22,7 +22,7 @@ The framework is divided into two decoupled programmatic engines:
 ## 🛠️ Repository Structure
 
 ```text
-├── check_point/   # Directory containing legacy development snapshots
+├── checkpoint/   # Directory containing legacy development snapshots
 ├── n5.py          # Core engine (f5 math hub & nn5 deep learning modules)
 ├── main.py        # Project entry point (Training scripts and testing pipelines)
 ├── model.n5       # Packed production-ready structural binary model file
@@ -30,8 +30,8 @@ The framework is divided into two decoupled programmatic engines:
 └── README.md      # System documentation
 ```
 
-### ⚠️ Important Notice regarding `check_point/`
-The `check_point/` directory contains legacy developmental snapshots and older architectural backups of the network. 
+### ⚠️ Important Notice regarding `checkpoint/`
+The `checkpoint/` directory contains legacy developmental snapshots and older architectural backups of the network. 
 - **Disclaimer**: Some evolutionary copies inside this folder might be **unstable, corrupted, or broken** due to fundamental structural refactoring during development.
 - Other historical versions are functional and can be executed for progressive research tracking. Use with caution.
 
