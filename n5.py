@@ -250,6 +250,7 @@ class nn5:
         def backward(self, da):
             raise NotImplementedError
         def update(self, lr):
+                # TODO 
             pass
 
     class Dense(Layer):
@@ -670,48 +671,3 @@ class SquareLayer(nn5.Layer):
     def backward(self, da):
         # da: upstream gradient
         return 2 * self.X * da
-
-
-# If run as script show simple examples for each layer
-if __name__ == '__main__':
-    print('n5 lightweight demo: Dense, Dropout, Conv2D, Pooling, Custom Layer')
-
-    # Dense example
-    X = np.random.randn(4, 3)
-    y = np.random.randint(0, 2, (4,1))
-    model = nn5.Sequential()
-    model.add(nn5.Dense(3, 8, activation='gelu'))
-    model.add(nn5.Dense(8, 4, activation='leaky_relu'))
-    model.add(nn5.Dense(4, 1, activation='sigmoid'))
-    model.summary()
-    model.train(X, y, epochs=3, lr_init=0.01, loss_type='bce')
-
-    # Dropout example
-    X2 = np.random.randn(2,4)
-    drop = nn5.Dropout(rate=0.5, seed=42)
-    print('\nDropout forward (training):')
-    print(drop.forward(X2, training=True))
-    print('Dropout backward sample:')
-    print(drop.backward(np.ones_like(X2)))
-
-    # Conv2D + Pooling example (toy)
-    Xin = np.random.randn(1,8,8,1)  # batch=1, 8x8 grayscale
-    conv = nn5.Conv2D(in_channels=1, out_channels=2, kernel_size=3, stride=1, padding=0, activation='relu')
-    out = conv.forward(Xin)
-    print('\nConv2D output shape:', out.shape)
-    pool = nn5.MaxPool2D(pool_size=2, stride=2)
-    p = pool.forward(out)
-    print('After MaxPool2D shape:', p.shape)
-
-    # Custom layer demo
-    seq2 = nn5.Sequential()
-    seq2.add(nn5.Dense(3,3, activation='relu'))
-    seq2.add(SquareLayer())
-    x3 = np.random.randn(2,3)
-    print('\nCustom layer pipeline output:')
-    print(seq2.predict(x3))
-
-    # Save/load state demo
-    model.save_state('demo_model.npz')
-    loaded = nn5.Sequential.load_state('demo_model.npz')
-    print('Loaded sequential layers:', [l.__class__.__name__ for l in loaded.layers])
